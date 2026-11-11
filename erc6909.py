@@ -295,6 +295,25 @@ class ERC6909Token:
             if tid == token_id and bal > 0
         )
 
+    def ids_of(self, owner: str) -> list[int]:
+        """Token ids ``owner`` holds a nonzero balance of.
+
+        >>> t = ERC6909Token()
+        >>> t.mint("alice", 1, 10)
+        >>> t.mint("alice", 2, 3)
+        >>> t.mint("bob", 2, 7)
+        >>> t.ids_of("alice")
+        [1, 2]
+        >>> t.ids_of("bob")
+        [2]
+        >>> t.ids_of("nobody")
+        []
+        """
+        return sorted(
+            tid for (who, tid), bal in self._balances.items()
+            if who == owner and bal > 0
+        )
+
 
 def demo() -> None:
     """Two ids, one operator, one allowance: the whole standard in 20 lines."""
@@ -310,6 +329,7 @@ def demo() -> None:
         t.transfer_from("alice", "dave", 1, 25)   # allowance moves points
     print(f"id 1 supply: {t.total_supply(1)}, holders: {t.holders_of(1)}")
     print(f"id 2 owner:  {t.holders_of(2)}")
+    print(f"alice's ids: {t.ids_of('alice')}")
     print(f"bob's remaining allowance: {t.allowance('alice', 'bob', 1)}")
     print(f"events logged: {len(t.events)}")
 
